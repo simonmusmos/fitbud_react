@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/components/auth-provider';
 import { LoadingSpinner } from '@/components/loading-spinner';
 
@@ -11,35 +11,37 @@ export default function SignUpPasswordScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const router = useRouter();
   const { signup } = useAuth();
+  const { email, firstName, lastName } = useLocalSearchParams(); // Get params from previous screen
 
   const handleSignUp = async () => {
     if (!password || !confirmPassword) {
-      alert('Please fill in both password fields');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    
-    if (password.length < 6) {
-      alert('Password must be at least 6 characters long');
+      Alert.alert('Error', 'Please fill in both password fields');
       return;
     }
 
-    // Simulate signup process
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      // Use the email and name values passed from the previous screen
+      await signup(email as string, password, firstName as string, lastName as string);
+      // Signup successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      Alert.alert('Signup Error', error.message || 'An error occurred during signup');
+    } finally {
       setIsLoading(false);
-      // Use auth context to update login state
-      signup();
-      // Navigate to onboarding after successful signup
-      router.push('/onboarding/personal-info');
-    }, 1500);
+    }
   };
 
   const handleBack = () => {

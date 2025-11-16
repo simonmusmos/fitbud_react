@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import 'react-native-url-polyfill/auto';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/components/auth-provider';
@@ -66,13 +67,20 @@ export default function RootLayout() {
                 animation: 'slide_from_right'
               }} 
             />
-            <Stack.Screen 
-              name="onboarding/completion" 
-              options={{ 
+            <Stack.Screen
+              name="onboarding/completion"
+              options={{
                 headerShown: false,
                 presentation: 'modal',
                 animation: 'slide_from_right'
-              }} 
+              }}
+            />
+            <Stack.Screen
+              name="auth-callback"
+              options={{
+                headerShown: false,
+                presentation: 'modal'
+              }}
             />
           </Stack>
           <StatusBar style="auto" />

@@ -1,35 +1,47 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useAuth } from '@/components/auth-provider';
 
 export default function SignUpEmailScreen() {
   const [email, setEmail] = useState('');
   const router = useRouter();
+  const { signInWithGoogle, signInWithApple } = useAuth();
+  const { firstName, lastName } = useLocalSearchParams(); // Get name values from previous screen
 
   const handleNext = () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      alert('Please enter a valid email address');
+      Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
-    router.push('/signup/password');
+    // Pass email, firstName, and lastName to the password screen
+    router.push({
+      pathname: '/signup/password',
+      params: { email, firstName, lastName }
+    });
   };
 
   const handleBack = () => {
     router.back();
   };
 
-  // Placeholder functions for social sign-in
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google sign-in functionality
-    console.log('Google sign-in pressed');
-    alert('Google sign-in not implemented yet');
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      // Sign-in successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      Alert.alert('Google Sign-Up Error', error.message || 'An error occurred during Google sign-up');
+    }
   };
 
-  const handleAppleSignIn = () => {
-    // TODO: Implement Apple sign-in functionality
-    console.log('Apple sign-in pressed');
-    alert('Apple sign-in not implemented yet');
+  const handleAppleSignIn = async () => {
+    try {
+      await signInWithApple();
+      // Sign-in successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      Alert.alert('Apple Sign-Up Error', error.message || 'An error occurred during Apple sign-up');
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -10,10 +10,14 @@ export default function SignUpNameScreen() {
 
   const handleNext = () => {
     if (!firstName || !lastName) {
-      alert('Please enter both first and last name');
+      Alert.alert('Error', 'Please enter both first and last name');
       return;
     }
-    router.push('/signup/email');
+    // Pass the name values to the email screen
+    router.push({
+      pathname: '/signup/email',
+      params: { firstName, lastName }
+    });
   };
 
   const handleBack = () => {

@@ -13,8 +13,8 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
-  
+  const { login, signInWithGoogle, signInWithApple } = useAuth();
+
   // Animation values
   const fadeAnim = new Animated.Value(0);
   const slideAnim = new Animated.Value(50);
@@ -43,7 +43,7 @@ export default function LoginScreen() {
     ]).start();
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Simple validation
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -51,12 +51,36 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    // Simulate login process
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      // Login successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      Alert.alert('Login Error', error.message || 'An error occurred during login');
+    } finally {
       setIsLoading(false);
-      // Use auth context to update login state
-      login();
-    }, 1500);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    console.log('Google sign-in initiated');
+    try {
+      console.log('Attempting to call signInWithGoogle');
+      await signInWithGoogle();
+      console.log('Sign-in successful - user will be redirected automatically by AuthProvider');
+      // Sign-in successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      Alert.alert('Google Sign-In Error', error.message || 'An error occurred during Google sign-in');
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      await signInWithApple();
+      // Sign-in successful - user will be redirected automatically by AuthProvider
+    } catch (error: any) {
+      Alert.alert('Apple Sign-In Error', error.message || 'An error occurred during Apple sign-in');
+    }
   };
 
   return (
@@ -69,7 +93,7 @@ export default function LoginScreen() {
         style={StyleSheet.absoluteFillObject}
         pointerEvents="none"
       />
-      
+
       <View style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -77,9 +101,9 @@ export default function LoginScreen() {
           bounces={false}
         >
           {/* Header section with logo and title */}
-          <Animated.View style={[styles.header, { 
-            opacity: fadeAnim, 
-            transform: [{ translateY: slideAnim }, { scale: scaleAnim }] 
+          <Animated.View style={[styles.header, {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }, { scale: scaleAnim }]
           }]}>
             <View style={styles.logoContainer}>
               <View style={styles.logoCircle}>
@@ -173,12 +197,18 @@ export default function LoginScreen() {
 
               {/* Social Login Buttons */}
               <View style={styles.socialButtonsContainer}>
-                <TouchableOpacity style={[styles.socialLoginButton, styles.googleButton]}>
+                <TouchableOpacity
+                  style={[styles.socialLoginButton, styles.googleButton]}
+                  onPress={handleGoogleSignIn}
+                >
                   <Ionicons name="logo-google" size={20} color="#DB4437" style={styles.socialIcon} />
                   <Text style={styles.socialLoginText}>Google</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.socialLoginButton, styles.appleButton]}>
+                <TouchableOpacity
+                  style={[styles.socialLoginButton, styles.appleButton]}
+                  onPress={handleAppleSignIn}
+                >
                   <Ionicons name="logo-apple" size={20} color="#FFFFFF" style={styles.socialIcon} />
                   <Text style={[styles.socialLoginText, styles.appleButtonText]}>Apple</Text>
                 </TouchableOpacity>
