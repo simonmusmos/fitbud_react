@@ -19,6 +19,19 @@ export default function SignUpEmailScreen() {
     router.back();
   };
 
+  // Placeholder functions for social sign-in
+  const handleGoogleSignIn = () => {
+    // TODO: Implement Google sign-in functionality
+    console.log('Google sign-in pressed');
+    alert('Google sign-in not implemented yet');
+  };
+
+  const handleAppleSignIn = () => {
+    // TODO: Implement Apple sign-in functionality
+    console.log('Apple sign-in pressed');
+    alert('Apple sign-in not implemented yet');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -45,7 +58,7 @@ export default function SignUpEmailScreen() {
             <Ionicons name="mail" size={40} color="#667eea" />
           </View>
         </View>
-        
+
         <Text style={styles.title}>Your Email</Text>
         <Text style={styles.subtitle}>We'll send a confirmation to this address</Text>
 
@@ -73,13 +86,39 @@ export default function SignUpEmailScreen() {
 
         {/* Navigation Button */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.nextButton} 
+          <TouchableOpacity
+            style={styles.nextButton}
             onPress={handleNext}
             disabled={!email || !/^\S+@\S+\.\S+$/.test(email)}
           >
             <Text style={styles.nextButtonText}>Next</Text>
             <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>or sign up with</Text>
+          <View style={styles.divider} />
+        </View>
+
+        {/* Social Signup Buttons */}
+        <View style={styles.socialButtonsContainer}>
+          <TouchableOpacity
+            style={[styles.socialLoginButton, styles.googleButton]}
+            onPress={handleGoogleSignIn}
+          >
+            <Ionicons name="logo-google" size={20} color="#DB4437" style={styles.socialIcon} />
+            <Text style={styles.socialLoginText}>Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.socialLoginButton, styles.appleButton]}
+            onPress={handleAppleSignIn}
+          >
+            <Ionicons name="logo-apple" size={20} color="#FFFFFF" style={styles.socialIcon} />
+            <Text style={[styles.socialLoginText, styles.appleButtonText]}>Apple</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -215,5 +254,62 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     marginRight: 8,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+    width: '100%',
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+  },
+  socialLoginButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 14,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+  },
+  socialIcon: {
+    marginRight: 8,
+  },
+  socialLoginText: {
+    fontSize: 16,
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  appleButtonText: {
+    color: '#FFFFFF',
   },
 });
