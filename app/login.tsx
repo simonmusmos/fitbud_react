@@ -12,6 +12,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [generalError, setGeneralError] = useState('');
   const router = useRouter();
   const { login, signInWithGoogle, signInWithApple } = useAuth();
 
@@ -44,9 +47,27 @@ export default function LoginScreen() {
   }, []);
 
   const handleLogin = async () => {
+    // Clear previous errors
+    setEmailError('');
+    setPasswordError('');
+    setGeneralError('');
+
     // Simple validation
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    let hasError = false;
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
@@ -55,7 +76,7 @@ export default function LoginScreen() {
       await login(email, password);
       // Login successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
-      Alert.alert('Login Error', error.message || 'An error occurred during login');
+      setGeneralError(error.message || 'An error occurred during login');
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +84,8 @@ export default function LoginScreen() {
 
   const handleGoogleSignIn = async () => {
     console.log('Google sign-in initiated');
+    setIsLoading(true);
+    setGeneralError('');
     try {
       console.log('Attempting to call signInWithGoogle');
       await signInWithGoogle();
@@ -70,16 +93,22 @@ export default function LoginScreen() {
       // Sign-in successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      Alert.alert('Google Sign-In Error', error.message || 'An error occurred during Google sign-in');
+      setGeneralError(error.message || 'An error occurred during Google sign-in');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAppleSignIn = async () => {
+    setIsLoading(true);
+    setGeneralError('');
     try {
       await signInWithApple();
       // Sign-in successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
-      Alert.alert('Apple Sign-In Error', error.message || 'An error occurred during Apple sign-in');
+      setGeneralError(error.message || 'An error occurred during Apple sign-in');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -125,7 +154,10 @@ export default function LoginScreen() {
                   placeholder="Email address"
                   placeholderTextColor="#9CA3AF"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    if (emailError) setEmailError(''); // Clear error when user starts typing
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -136,6 +168,9 @@ export default function LoginScreen() {
                   editable={true}
                 />
               </View>
+              {emailError ? (
+                <Text style={styles.errorText}>{emailError}</Text>
+              ) : null}
 
               {/* Password Input */}
               <View style={styles.inputContainer}>
@@ -145,7 +180,10 @@ export default function LoginScreen() {
                   placeholder="Password"
                   placeholderTextColor="#9CA3AF"
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (passwordError) setPasswordError(''); // Clear error when user starts typing
+                  }}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -166,6 +204,9 @@ export default function LoginScreen() {
                   />
                 </TouchableOpacity>
               </View>
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
 
               {/* Forgot Password */}
               <TouchableOpacity style={styles.forgotPassword}>
@@ -174,9 +215,12 @@ export default function LoginScreen() {
 
               {/* Login Button */}
               <TouchableOpacity
-                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                style={[
+                  styles.loginButton,
+                  (isLoading || !email || !password || !!emailError || !!passwordError) && styles.loginButtonDisabled
+                ]}
                 onPress={handleLogin}
-                disabled={isLoading}
+                disabled={isLoading || !email || !password || !!emailError || !!passwordError}
               >
                 {isLoading ? (
                   <View style={styles.loadingContainer}>
@@ -187,6 +231,11 @@ export default function LoginScreen() {
                   <Text style={styles.loginButtonText}>Sign In</Text>
                 )}
               </TouchableOpacity>
+
+              {/* General Error Message */}
+              {generalError ? (
+                <Text style={styles.generalErrorText}>{generalError}</Text>
+              ) : null}
 
               {/* Divider */}
               <View style={styles.dividerContainer}>
@@ -200,6 +249,7 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   style={[styles.socialLoginButton, styles.googleButton]}
                   onPress={handleGoogleSignIn}
+                  disabled={isLoading}
                 >
                   <Ionicons name="logo-google" size={20} color="#DB4437" style={styles.socialIcon} />
                   <Text style={styles.socialLoginText}>Google</Text>
@@ -208,6 +258,7 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   style={[styles.socialLoginButton, styles.appleButton]}
                   onPress={handleAppleSignIn}
+                  disabled={isLoading}
                 >
                   <Ionicons name="logo-apple" size={20} color="#FFFFFF" style={styles.socialIcon} />
                   <Text style={[styles.socialLoginText, styles.appleButtonText]}>Apple</Text>

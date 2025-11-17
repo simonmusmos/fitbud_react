@@ -6,15 +6,31 @@ import { useAuth } from '@/components/auth-provider';
 
 export default function SignUpEmailScreen() {
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [generalError, setGeneralError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { signInWithGoogle, signInWithApple } = useAuth();
   const { firstName, lastName } = useLocalSearchParams(); // Get name values from previous screen
 
   const handleNext = () => {
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+    // Clear previous errors
+    setEmailError('');
+    setGeneralError('');
+
+    let hasError = false;
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
+
     // Pass email, firstName, and lastName to the password screen
     router.push({
       pathname: '/signup/password',
@@ -27,20 +43,28 @@ export default function SignUpEmailScreen() {
   };
 
   const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setGeneralError('');
     try {
       await signInWithGoogle();
       // Sign-in successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
-      Alert.alert('Google Sign-Up Error', error.message || 'An error occurred during Google sign-up');
+      setGeneralError(error.message || 'An error occurred during Google sign-up');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAppleSignIn = async () => {
+    setIsLoading(true);
+    setGeneralError('');
     try {
       await signInWithApple();
       // Sign-in successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
-      Alert.alert('Apple Sign-Up Error', error.message || 'An error occurred during Apple sign-up');
+      setGeneralError(error.message || 'An error occurred during Apple sign-up');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,7 +107,10 @@ export default function SignUpEmailScreen() {
               style={styles.textInput}
               placeholder="john.doe@example.com"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (emailError) setEmailError(''); // Clear error when user starts typing
+              }}
               placeholderTextColor="#9CA3AF"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -96,12 +123,20 @@ export default function SignUpEmailScreen() {
           </View>
         </View>
 
+        {/* General Error Message */}
+        {generalError ? (
+          <Text style={styles.generalErrorText}>{generalError}</Text>
+        ) : null}
+
         {/* Navigation Button */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.nextButton}
+            style={[
+              styles.nextButton,
+              (!!emailError || !email || !/^\S+@\S+\.\S+$/.test(email)) && styles.nextButtonDisabled
+            ]}
             onPress={handleNext}
-            disabled={!email || !/^\S+@\S+\.\S+$/.test(email)}
+            disabled={!!emailError || !email || !/^\S+@\S+\.\S+$/.test(email)}
           >
             <Text style={styles.nextButtonText}>Next</Text>
             <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
@@ -120,6 +155,7 @@ export default function SignUpEmailScreen() {
           <TouchableOpacity
             style={[styles.socialLoginButton, styles.googleButton]}
             onPress={handleGoogleSignIn}
+            disabled={isLoading}
           >
             <Ionicons name="logo-google" size={20} color="#DB4437" style={styles.socialIcon} />
             <Text style={styles.socialLoginText}>Google</Text>
@@ -128,6 +164,7 @@ export default function SignUpEmailScreen() {
           <TouchableOpacity
             style={[styles.socialLoginButton, styles.appleButton]}
             onPress={handleAppleSignIn}
+            disabled={isLoading}
           >
             <Ionicons name="logo-apple" size={20} color="#FFFFFF" style={styles.socialIcon} />
             <Text style={[styles.socialLoginText, styles.appleButtonText]}>Apple</Text>
@@ -323,5 +360,13 @@ const styles = StyleSheet.create({
   },
   appleButtonText: {
     color: '#FFFFFF',
+  },
+  generalErrorText: {
+    color: '#EF4444', // Red color for error
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 8,
+    fontWeight: '500',
   },
 });

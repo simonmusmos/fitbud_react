@@ -190,8 +190,11 @@ export default function SignUpPasswordScreen() {
 
         {/* Navigation Button */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.signUpButton} 
+          <TouchableOpacity
+            style={[
+              styles.signUpButton,
+              (isLoading || !password || !confirmPassword || password !== confirmPassword) && styles.signUpButtonDisabled
+            ]}
             onPress={handleSignUp}
             disabled={isLoading || !password || !confirmPassword || password !== confirmPassword}
           >
@@ -369,5 +372,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  signUpButtonDisabled: {
+    opacity: 0.5,
   },
 });
