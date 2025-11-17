@@ -193,10 +193,10 @@ export default function SignUpPasswordScreen() {
           <TouchableOpacity
             style={[
               styles.signUpButton,
-              (isLoading || !password || !confirmPassword || password !== confirmPassword) && styles.signUpButtonDisabled
+              isLoading && styles.signUpButtonDisabled
             ]}
             onPress={handleSignUp}
-            disabled={isLoading || !password || !confirmPassword || password !== confirmPassword}
+            disabled={isLoading}
           >
             {isLoading ? (
               <View style={styles.loadingContainer}>
