@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (isLoggedIn === true) {
         // If user completed onboarding, go to main app; otherwise, go to onboarding
         console.log('onboarding');
-        router.replace('/(tabs)/index');
+        // router.replace('/(tabs)/index');
       }
     }
     // Don't redirect if isLoggedIn is still null (loading state)
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    setIsAuthenticating(true);
+    // setIsAuthenticating(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,

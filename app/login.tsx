@@ -55,14 +55,14 @@ export default function LoginScreen() {
       return;
     }
 
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
       await login(email, password);
       // Login successful - user will be redirected automatically by AuthProvider
     } catch (error: any) {
       Alert.alert('Login Error', error.message || 'An error occurred during login');
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
@@ -124,6 +124,12 @@ export default function LoginScreen() {
           {/* Form container with modern card design */}
           <Animated.View style={[styles.formContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <View style={styles.form}>
+              {/* Loading indicator - appears during loading but doesn't hide the form */}
+              {isLoading && (
+                <View style={styles.loadingIndicator}>
+                  <LoadingSpinner size={20} color="#667eea" />
+                </View>
+              )}
               {/* Email Input */}
               <View style={styles.inputContainer}>
                 <Ionicons name="mail-outline" size={20} color="#6B7280" style={styles.inputIcon} />
@@ -314,6 +320,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+  },
+  loadingIndicator: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 12,
+    padding: 8,
   },
   inputIcon: {
     marginRight: 12,

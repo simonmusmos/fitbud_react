@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/components/auth-provider';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignUpPasswordScreen() {
   const [password, setPassword] = useState('');
@@ -188,6 +188,13 @@ export default function SignUpPasswordScreen() {
           </View>
         </View>
 
+        {/* Loading indicator - appears during loading but doesn't hide the form */}
+        {isLoading && (
+          <View style={styles.loadingIndicator}>
+            <LoadingSpinner size={20} color="#667eea" />
+          </View>
+        )}
+
         {/* Navigation Button */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
@@ -256,6 +263,16 @@ const styles = StyleSheet.create({
   mainContent: {
     alignItems: 'center',
     paddingBottom: 20,
+    position: 'relative',
+  },
+  loadingIndicator: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 12,
+    padding: 8,
   },
   illustrationContainer: {
     marginBottom: 30,
@@ -337,20 +354,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 8,
   },
-  requirementsContainer: {
-    width: '100%',
-    marginTop: 10,
-    marginBottom: 30,
-  },
-  requirementItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  requirementText: {
-    fontSize: 14,
-    marginLeft: 8,
-  },
+  // requirementsContainer: {
+  //   width: '100%',
+  //   marginTop: 10,
+  //   marginBottom: 30,
+  // },
+  // requirementItem: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   marginBottom: 8,
+  // },
+  // requirementText: {
+  //   fontSize: 14,
+  //   marginLeft: 8,
+  // },
   buttonContainer: {
     width: '100%',
     paddingTop: 20,
